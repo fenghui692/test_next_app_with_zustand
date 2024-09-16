@@ -1,0 +1,59 @@
+<style>
+  :root {
+    --brand: rgba(250, 15, 117, 1);
+    accent-color: var(--brand);  /* input选中的填充色 */
+  }
+
+  fieldset {
+    border: 1px solid var(--brand);
+  }
+  legend {
+    color: var(--brand);
+  }
+
+  body {
+    color-scheme: light dark;  /* light | dark input内置背景的填充色 */
+  }
+
+  @media (prefers-color-scheme: dark) { /* 监听深色还是暗色 */
+    :root {
+      --brand: rgba(3, 169, 244, 1);
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+    }
+  }
+</style>
+<div class="wrapper">
+  <form action="">
+    <fieldset>
+      <legend>Accent-color Demo</legend>
+
+      <label>
+        Strawberries
+        <input type="checkbox" id="berries_1" value="strawberries" />
+      </label>
+
+      <label>
+        Radio Buttons
+        <div>
+          <input type="radio" name="accented-demo" checked />
+          <input type="radio" name="accented-demo" />
+          <input type="radio" name="accented-demo" />
+        </div>
+      </label>
+
+      <label>
+        Range Slider
+        <input type="range" />
+      </label>
+
+      <label>
+        Progress element
+        <progress max="100" value="50">50%</progress>
+      </label>
+    </fieldset>
+  </form>
+</div>
