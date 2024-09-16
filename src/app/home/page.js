@@ -29,14 +29,42 @@ export default function Home() {
   //   }))
   // );
 
-  // shallow 优化
+  // shallow 优化 废弃
+  // https://github.com/pmndrs/zustand/discussions/1937 shallow这种写法已废弃
+  // const { learningData, modifyLearningData } = useCounterAndCourseStore(
+  //   (state) => ({
+  //     learningData: state.learningData,
+  //     modifyLearningData: state.modifyLearningData,
+  //   }),
+  //   shallow
+  // );
+
+  //  要优化必须 createWithEqualityFn + shallow
   const { learningData, modifyLearningData } = useCounterAndCourseStore(
     (state) => ({
       learningData: state.learningData,
       modifyLearningData: state.modifyLearningData,
-    }),
-    shallow
+    })
   );
+
+  //  或者不管有无createWithEqualityFn + shallow ，自己实现
+  // const { learningData, modifyLearningData } = useCounterAndCourseStore(
+  //   (state) => ({
+  //     learningData: state.learningData,
+  //     modifyLearningData: state.modifyLearningData,
+  //   }),
+  //   (obj1, obj2) => {
+  //     if (obj1 === obj2) return true; // 如果引用相同，直接返回 true
+  //     if (obj1 == null || obj2 == null) return false; // 如果其中一个是 null 或 undefined
+  //     const keys1 = Object.keys(obj1);
+  //     const keys2 = Object.keys(obj2);
+  //     if (keys1.length !== keys2.length) return false; // 如果键的数量不同，返回 false
+  //     for (let key of keys1) {
+  //       if (obj1[key] !== obj2[key]) return false; // 如果属性值不同，返回 false
+  //     }
+  //     return true; // 如果所有属性值都相同，返回 true
+  //   }
+  // );
 
   console.log("parent");
 

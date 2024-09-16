@@ -5,8 +5,10 @@ import {
   createJSONStorage,
   subscribeWithSelector,
 } from "zustand/middleware";
+import { createWithEqualityFn } from "zustand/traditional";
+import { shallow } from "zustand/shallow";
 
-const useCounterAndCourseStore = create(
+const useCounterAndCourseStore = createWithEqualityFn(
   // 持久化
   persist(
     subscribeWithSelector(
@@ -44,7 +46,8 @@ const useCounterAndCourseStore = create(
       name: "countAndCourse",
       storage: createJSONStorage(() => localStorage), // 默认为localStorage ，这一行可以不写
     }
-  )
+  ),
+  shallow
 );
 
 export default useCounterAndCourseStore;
