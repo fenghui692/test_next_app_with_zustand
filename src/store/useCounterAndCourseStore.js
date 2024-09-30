@@ -9,9 +9,9 @@ import { createWithEqualityFn } from "zustand/traditional";
 import { shallow } from "zustand/shallow";
 
 const useCounterAndCourseStore = createWithEqualityFn(
-  // 持久化
+  // 持久化，开启会多渲染一次
   persist(
-    subscribeWithSelector(
+    subscribeWithSelector( 
       immer((set) => ({
         count: 0,
         learningData: {
