@@ -26,14 +26,14 @@ const useCounterAndCourseStore = createWithEqualityFn(
         decrement: () => set((state) => ({ count: state.count - 1 })),
         modifyLearningData: () =>
           set((state) => {
-            return {
-              learningData: {
-                ...state.learningData,
-                random: Math.random().toFixed(2),
-              },
-            };
-            // state.learningData.random = Math.random().toFixed(2);
-          }, false), // set的二个参数为true(或者不写)，相当与把这个store的所有值都去了，只剩下本次，但是immer写法不生效 ;  true置空后所有值包括函数都无效了，因为被覆盖了
+            state.learningData.random = Math.random().toFixed(2); // immer 不允许这种写法之后再return， 二者选其一
+            // return {
+            //   learningData: {
+            //     ...state.learningData,
+            //     random: Math.random().toFixed(2),
+            //   },
+            // };
+          }, false), // set的二个参数为true，相当与把这个store的所有值都去了，只剩下本次，但是immer写法不生效 ;  true置空后所有值包括此函数(modifyLearningData)都无效了，因为被覆盖了
         courseName: "next.js",
         coursesList: [1, 2, 3],
         addCourse: (course) =>

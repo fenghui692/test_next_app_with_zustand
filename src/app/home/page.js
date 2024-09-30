@@ -7,21 +7,33 @@ import { shallow } from "zustand/shallow";
 
 import styles from "@/app/page.module.css";
 
+/**
+ * 只讨论最新的zustand v5版本
+ * There is a behavioral change in v5 to match React default behavior. If a selector returns a new reference, it may cause infinite loops.
+ * v5 中的行为变化与 React 默认行为一致。如果选择器返回一个新引用，可能会导致无限循环. 解决方法：
+ * 1. 组件中state.xxx 具体取值
+ * 2. 组件中使用useShallow
+ * 3. store中使用createWithEqualityFn + shallow
+ * 4. store中使用createWithEqualityFn，这样可以变成v4的行为，然后组件中可以使用shallow(或者自定义)
+ */
 export default function Home() {
   const count = useCounterAndCourseStore((state) => state.count);
   const increment = useCounterAndCourseStore((state) => state.increment);
   const decrement = useCounterAndCourseStore((state) => state.decrement);
 
+
+  // 下面演示子组件ChildrenPage中的state变化后导致父组件重新渲染，处理如下:
+
   // 无优化
   // const { learningData, modifyLearningData } = useCounterAndCourseStore();
 
-  // 本身就是优化
+  // 1.本身就是优化
   // const learningData = useCounterAndCourseStore((state) => state.learningData);
   // const modifyLearningData = useCounterAndCourseStore(
   //   (state) => state.modifyLearningData
   // );
 
-  // useShallow 优化
+  // 2.useShallow 优化
   // const { learningData, modifyLearningData } = useCounterAndCourseStore(
   //   useShallow((state) => ({
   //     learningData: state.learningData,
@@ -29,8 +41,15 @@ export default function Home() {
   //   }))
   // );
 
-  // shallow 优化 废弃
-  // https://github.com/pmndrs/zustand/discussions/1937 shallow这种写法已废弃
+  // 3.createWithEqualityFn + shallow
+  const { learningData, modifyLearningData } = useCounterAndCourseStore(
+    (state) => ({
+      learningData: state.learningData,
+      modifyLearningData: state.modifyLearningData,
+    }),
+  );
+
+  // 4.1 createWithEqualityFn代替create是（变成v4解决 infinite loops问题(无优化)）， 优化需要加上第二个参数shallow
   // const { learningData, modifyLearningData } = useCounterAndCourseStore(
   //   (state) => ({
   //     learningData: state.learningData,
@@ -39,22 +58,14 @@ export default function Home() {
   //   shallow
   // );
 
-  //  要优化必须 createWithEqualityFn + shallow
-  const { learningData, modifyLearningData } = useCounterAndCourseStore(
-    (state) => ({
-      learningData: state.learningData,
-      modifyLearningData: state.modifyLearningData,
-    })
-  );
-
-  //  或者不管有无createWithEqualityFn + shallow ，自己实现
+  //  4.2 createWithEqualityFn代替create是（变成v4解决 infinite loops问题(无优化)）， 优化需要加上第二个参数，自己实现的版本
   // const { learningData, modifyLearningData } = useCounterAndCourseStore(
   //   (state) => ({
   //     learningData: state.learningData,
   //     modifyLearningData: state.modifyLearningData,
   //   }),
   //   (obj1, obj2) => {
-  //     if (obj1 === obj2) return true; // 如果引用相同，直接返回 true
+  //     if (obj1 === obj2) return true; // 如果引用相同，直接返回 true， true是不渲染
   //     if (obj1 == null || obj2 == null) return false; // 如果其中一个是 null 或 undefined
   //     const keys1 = Object.keys(obj1);
   //     const keys2 = Object.keys(obj2);
@@ -132,9 +143,5 @@ const ChildrenPage = memo(() => {
   );
 });
 
-// 父组件值发生变化，子组件也会重新渲染 ，子组件memo可以解决
-/* const { learningData, modifyLearningData } = useCounterAndCourseStore(); // 这种写法不好
-   子组件只有他的值,但是useCounterAndCourseStore() 相当于全部用了， 所以子组件也会重新渲染 */
-
-// 如果共用一个store，那么一个组件引起另一个组件变化(例如子影响父) ，需要使用useShallow、shallow
+// 如果共用一个store，那么一个组件引起另一个组件变化(例如子影响父) ，尝试使用1,2,3,4 来优化
 // 父影响子就用memo

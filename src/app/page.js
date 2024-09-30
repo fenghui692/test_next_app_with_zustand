@@ -18,7 +18,9 @@ export default function Home() {
   const count = useCounterStore((state) => state.count);
   const increment = useCounterStore((state) => state.increment);
   const decrement = useCounterStore((state) => state.decrement);
-  const { learningData, modifyLearningData } = useCounterStore(); // 这种写法不好，例如下面ChildrenPage 组件这样使用
+  const { learningData, modifyLearningData } = useCounterStore(); // 这种写法不好，因为store中一个变化都会刷新
+
+  // const coursesList = useCourseStore((state) => state.coursesList); // 没有用到，但是子组件中状态变化了，这里即使定义也会造成渲染
 
   // useEffect(() => {
   //   setTimeout(() => {
@@ -51,8 +53,12 @@ const ChildrenPage = memo(() => {
   const courseName = useCourseStore((state) => state.courseName);
   const coursesList = useCourseStore((state) => state.coursesList);
   const addCourse = useCourseStore((state) => state.addCourse);
+
+  // 下面用了父的store，父修改了，如果定义了即使没有用到也会渲染
+
   // const { learningData, modifyLearningData } = useCounterStore();  // 这样默认是全部监听，store变化而都会渲染
   // const modifyLearningData= useCounterStore(state =>state.learningData);  // 这样只监听learningData变化，count变化不会渲染
+
   console.log("children");
 
   return (
@@ -66,5 +72,5 @@ const ChildrenPage = memo(() => {
   );
 });
 
-// 父组件值发生变化，子组件也会重新渲染 ，子组件memo可以解决
-// 子组件变化，父组件不会渲染，因为不使用一个store， 如果父中使用了子修改的后的值(例如courseList), 父组件也会重新渲染
+// 父组件值发生变化，子组件也会重新渲染 ，子组件memo可以解决(并且没有用到父的更改的state)
+// 这个例子中，子组件变化，父组件不会渲染，因为不使用一个store， 如果父中使用了子修改的后的值(例如courseList), 父组件也会重新渲染
